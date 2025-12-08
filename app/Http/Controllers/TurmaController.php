@@ -4,18 +4,26 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Turma;
+use App\Models\Disciplina;
+use App\Models\User;
 
 class TurmaController extends Controller
 {
     public function index()
     {
         $turmas = Turma::all();
-        return view('turmas.turmas', compact('turmas'));
+        $disciplinas = Disciplina::all();
+        $professores = User::where('role', 'professor')->get();
+
+        return view('turmas.turmas', compact('turmas', 'disciplinas', 'professores'));
     }
 
     public function create()
     {
-        return view('turmas.create');
+        $disciplinas = Disciplina::all();
+        $professores = User::where('role', 'professor')->get();
+
+        return view('turmas.create', compact('disciplinas', 'professores'));
     }
 
     public function store(Request $request)
@@ -27,8 +35,14 @@ class TurmaController extends Controller
         $dados = $request->validate([
             'nome' => 'required',
             'descricao' => 'nullable',
-            'id_disciplina' => 'required|exists:disciplinas,id',
-            'id_professor' => 'required|exists:users,id',
+            'disciplina_id' => 'required|exists:disciplinas,id',
+            'professor_id' => 'required|exists:users,id',
+        ], [
+            'nome.required' => 'O campo nome é obrigatório.',
+            'disciplina_id.required' => 'O campo disciplina é obrigatório.',
+            'disciplina_id.exists' => 'A disciplina selecionada não existe.',
+            'professor_id.required' => 'O campo professor é obrigatório.',
+            'professor_id.exists' => 'O professor selecionado não existe.',
         ]);
 
         Turma::create($dados);
@@ -46,6 +60,8 @@ class TurmaController extends Controller
         $request->validate([
             'nome' => 'required',
             'descricao' => 'nullable',
+        ], [
+            'nome.required' => 'O campo nome é obrigatório.',
         ]);
 
         $turma = Turma::findOrFail($id);

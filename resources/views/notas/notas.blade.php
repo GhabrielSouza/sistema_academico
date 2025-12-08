@@ -13,15 +13,17 @@
                         <h2 class="text-2xl font-bold text-gray-800">Notas</h2>
                         <p class="mt-1 text-sm text-gray-600">Gerencie as notas dos alunos</p>
                     </div>
-                    <button x-data="" x-on:click="$dispatch('open-modal', 'confirm-user-deletion')"
-                        class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                        </svg>
-                        Nova Nota
-                    </button>
+                    @if(Auth::user()->role !== 'aluno')
+                        <button x-data="" x-on:click="$dispatch('open-modal', 'confirm-user-create')"
+                            class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            Nova Nota
+                        </button>
+                    @endif
                 </div>
 
                 <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 rounded-lg">
@@ -33,7 +35,7 @@
                                     Aluno
                                 </th>
                                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                    Disciplina
+                                    Turma
                                 </th>
                                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                     Nota
@@ -52,13 +54,13 @@
                                                 <div
                                                     class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
                                                     <span class="text-indigo-800 font-bold text-sm">
-                                                        {{ substr($nota->aluno->name, 0, 2) }}
+                                                        {{ substr($nota->usuario->name, 0, 2) }}
                                                     </span>
                                                 </div>
                                             </div>
                                             <div class="ml-4">
-                                                <div class="font-medium text-gray-900">{{ $nota->aluno->name }}</div>
-                                                <div class="text-gray-500 text-xs">ID: {{ $nota->aluno->id }}</div>
+                                                <div class="font-medium text-gray-900">{{ $nota->usuario->name }}</div>
+                                                <div class="text-gray-500 text-xs">ID: {{ $nota->usuario->id }}</div>
                                             </div>
                                         </div>
                                     </td>
@@ -67,21 +69,21 @@
                                             <div
                                                 class="flex-shrink-0 h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
                                                 <span class="text-blue-800 text-xs font-bold">
-                                                    {{ substr($nota->disciplina->nome, 0, 2) }}
+                                                    {{ substr($nota->turma->nome, 0, 2) }}
                                                 </span>
                                             </div>
-                                            <div class="font-medium text-gray-900">{{ $nota->disciplina->nome }}</div>
+                                            <div class="font-medium text-gray-900">{{ $nota->turma->nome }}</div>
                                         </div>
                                     </td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm">
                                         <div class="flex items-center">
                                             <div class="mr-3">
-                                                @if($nota->valor >= 7)
+                                                @if($nota->valor >= 70)
                                                     <span
                                                         class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
                                                         {{ $nota->valor }}
                                                     </span>
-                                                @elseif($nota->valor >= 5)
+                                                @elseif($nota->valor >= 50)
                                                     <span
                                                         class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
                                                         {{ $nota->valor }}
@@ -94,7 +96,7 @@
                                                 @endif
                                             </div>
                                             <div class="text-gray-500 text-xs">
-                                                @if($nota->valor >= 7)
+                                                @if($nota->valor >= 70)
                                                     <span class="flex items-center">
                                                         <svg class="mr-1 h-3 w-3 text-green-500" fill="currentColor"
                                                             viewBox="0 0 20 20">
@@ -104,7 +106,7 @@
                                                         </svg>
                                                         Aprovado
                                                     </span>
-                                                @elseif($nota->valor >= 5)
+                                                @elseif($nota->valor >= 50)
                                                     <span class="flex items-center">
                                                         <svg class="mr-1 h-3 w-3 text-yellow-500" fill="currentColor"
                                                             viewBox="0 0 20 20">
@@ -131,32 +133,28 @@
                                     <td
                                         class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                                         <div class="flex justify-end space-x-3">
-                                            <a href="#" class="text-indigo-600 hover:text-indigo-900" title="Editar">
-                                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                                    xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                                    </path>
-                                                </svg>
-                                            </a>
-                                            <a href="#" class="text-gray-600 hover:text-gray-900" title="Visualizar">
-                                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                                    xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                                    </path>
-                                                </svg>
-                                            </a>
-                                            <a href="#" class="text-red-600 hover:text-red-900" title="Excluir">
-                                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                                    xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                                    </path>
-                                                </svg>
-                                            </a>
+                                            @if(Auth::user()->role !== 'aluno')
+                                                <button class="text-indigo-600 hover:text-indigo-900" title="Editar" x-data=""
+                                                    x-on:click="$dispatch('open-modal', 'confirm-user-update-{{ $nota->id }}')">
+                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                                        xmlns="http://www.w3.org/2000/svg">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                                        </path>
+                                                    </svg>
+                                                </button>
+                                            @endif
+                                            @if (Auth::user()->role !== 'aluno' && Auth::user()->role !== 'professor')
+                                                <button class="text-red-600 hover:text-red-900" title="Excluir" x-data=""
+                                                    x-on:click="$dispatch('open-modal', 'delete-modal-{{ $nota->id }}')">
+                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                                        xmlns="http://www.w3.org/2000/svg">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                        </path>
+                                                    </svg>
+                                                </button>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
@@ -172,18 +170,21 @@
                                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                             <h3 class="mt-2 text-sm font-medium text-gray-900">Nenhuma nota cadastrada</h3>
+                            @if(Auth::user()->role !== 'aluno')
                             <p class="mt-1 text-sm text-gray-500">Comece registrando a primeira nota.</p>
+                            @endif
                             <div class="mt-6">
-                                <button type="button" x-data=""
-                                    x-on:click="$dispatch('open-modal', 'confirm-user-deletion')"
-                                    class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                    </svg>
-                                    Nova Nota
-                                </button>
+                                @if(Auth::user()->role !== 'aluno')
+                                    <button type="button" x-data="" x-on:click="$dispatch('open-modal', 'confirm-user-create')"
+                                        class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                        </svg>
+                                        Nova Nota
+                                    </button>
+                                @endif
                             </div>
                         </div>
                     @else
@@ -218,7 +219,7 @@
                                                 viewBox="0 0 8 8">
                                                 <circle cx="4" cy="4" r="3"></circle>
                                             </svg>
-                                            Aprovado: {{ $notas->where('valor', '>=', 7)->count() }}
+                                            Aprovado: {{ $notas->where('valor', '>=', 70)->count() }}
                                         </span>
                                         <span
                                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
@@ -226,14 +227,14 @@
                                                 viewBox="0 0 8 8">
                                                 <circle cx="4" cy="4" r="3"></circle>
                                             </svg>
-                                            Recuperação: {{ $notas->whereBetween('valor', [5, 6.99])->count() }}
+                                            Recuperação: {{ $notas->whereBetween('valor', [50, 69.99])->count() }}
                                         </span>
                                         <span
                                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                             <svg class="mr-1.5 h-2 w-2 text-red-400" fill="currentColor" viewBox="0 0 8 8">
                                                 <circle cx="4" cy="4" r="3"></circle>
                                             </svg>
-                                            Reprovado: {{ $notas->where('valor', '<', 5)->count() }}
+                                            Reprovado: {{ $notas->where('valor', '<', 50)->count() }}
                                         </span>
                                     </div>
                                 </div>
@@ -244,34 +245,160 @@
             </div>
         </div>
     </div>
-    <!-- modal -->
-    <x-modal name="confirm-user-deletion" :show="$errors->userDeletion->isNotEmpty()" focusable>
+
+    <!-- MODAIS (DEVEM ESTAR FORA DA TABELA) -->
+
+    <!-- Modal de criação -->
+    <x-modal name="confirm-user-create" :show="$errors->any()" focusable>
         <form method="post" action="{{ route('notas.store') }}" class="p-6">
             @csrf
-            @method('post')
 
             <h2 class="text-lg font-medium text-gray-900">
                 {{ __('Inserir Notas') }}
             </h2>
 
             <div class="mt-6">
-                <x-input-label for="password" value="{{ __('Password') }}" class="sr-only" />
+                <x-input-label for="valor" value="{{ __('Nota') }}" />
 
-                <x-text-input id="password" name="password" type="password" class="mt-1 block w-3/4"
-                    placeholder="{{ __('Password') }}" />
+                <x-text-input id="valor" name="valor" type="number" min="0" max="100" step="0.01"
+                    class="mt-1 block w-3/4" placeholder="{{ __('Valor') }}" value="{{ old('valor') }}" />
 
-                <x-input-error :messages="$errors->userDeletion->get('password')" class="mt-2" />
+                <x-input-error :messages="$errors->get('valor')" class="mt-2" />
+            </div>
+
+            <div class="mt-6">
+                <x-input-label for="aluno_id" value="{{ __('Aluno') }}" />
+
+                <select name="aluno_id" id="aluno_id"
+                    class="mt-1 block w-3/4 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <option value="">{{ __('Selecione um aluno') }}</option>
+                    @foreach ($alunos as $aluno)
+                        <option value="{{ $aluno->id }}" {{ old('aluno_id') == $aluno->id ? 'selected' : '' }}>
+                            {{ $aluno->name }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <x-input-error :messages="$errors->get('aluno_id')" class="mt-2" />
+            </div>
+
+            <div class="mt-6">
+                <x-input-label for="turma_id" value="{{ __('Turma') }}" />
+
+                <select name="turma_id" id="turma_id"
+                    class="mt-1 block w-3/4 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <option value="">{{ __('Selecione uma turma') }}</option>
+                    @foreach ($turmas as $turma)
+                        <option value="{{ $turma->id }}" {{ old('turma_id') == $turma->id ? 'selected' : '' }}>
+                            {{ $turma->nome }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <x-input-error :messages="$errors->get('turma_id')" class="mt-2" />
             </div>
 
             <div class="mt-6 flex justify-end">
-                <x-secondary-button x-on:click="$dispatch('close')">
-                    {{ __('Cancel') }}
+                <x-secondary-button type="button" x-on:click="$dispatch('close')">
+                    {{ __('Cancelar') }}
                 </x-secondary-button>
 
-                <x-danger-button class="ms-3">
+                <x-primary-button class="ms-3">
                     {{ __('Salvar') }}
-                </x-danger-button>
+                </x-primary-button>
             </div>
         </form>
     </x-modal>
+
+    <!-- Modais dinâmicos para cada nota (fora da tabela) -->
+    @foreach ($notas as $nota)
+        <!-- Modal de atualizar nota -->
+        <x-modal name="confirm-user-update-{{ $nota->id }}" :show="$errors->any()" focusable>
+            <form method="post" action="{{ route('notas.update', $nota->id) }}" class="p-6">
+                @csrf
+                @method('put')
+                <h2 class="text-lg font-medium text-gray-900">
+                    {{ __('Atualizar Nota') }}
+                </h2>
+
+                <div class="mt-6">
+                    <x-input-label for="valor" value="{{ __('Nota') }}" />
+
+                    <x-text-input id="valor" name="valor" type="number" min="0" max="100"
+                        step="0.01" class="mt-1 block w-3/4" placeholder="{{ __('Valor') }}"
+                        value="{{ old('valor', $nota->valor) }}" />
+
+                    <x-input-error :messages="$errors->get('valor')" class="mt-2" />
+                </div>
+
+                <div class="mt-6">
+                    <x-input-label for="aluno_id" value="{{ __('Aluno') }}" />
+
+                    <select name="aluno_id" id="aluno_id"
+                        class="mt-1 block w-3/4 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                        <option value="">{{ __('Selecione um aluno') }}</option>
+                        @foreach ($alunos as $aluno)
+                            <option value="{{ $aluno->id }}" {{ old('aluno_id', $nota->aluno_id) == $aluno->id ? 'selected' : '' }}>
+                                {{ $aluno->name }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    <x-input-error :messages="$errors->get('aluno_id')" class="mt-2" />
+                </div>
+
+                <div class="mt-6">
+                    <x-input-label for="turma_id" value="{{ __('Turma') }}" />
+
+                    <select name="turma_id" id="turma_id"
+                        class="mt-1 block w-3/4 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                        <option value="">{{ __('Selecione uma turma') }}</option>
+                        @foreach ($turmas as $turma)
+                            <option value="{{ $turma->id }}" {{ old('turma_id', $nota->turma_id) == $turma->id ? 'selected' : '' }}>
+                                {{ $turma->nome }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    <x-input-error :messages="$errors->get('turma_id')" class="mt-2" />
+                </div>
+
+                <div class="mt-6 flex justify-end">
+                    <x-secondary-button type="button" x-on:click="$dispatch('close')">
+                        {{ __('Cancelar') }}
+                    </x-secondary-button>
+
+                    <x-primary-button class="ms-3">
+                        {{ __('Salvar') }}
+                    </x-primary-button>
+                </div>
+            </form>
+        </x-modal>
+
+        <!-- Modal de excluir -->
+        <x-modal name="delete-modal-{{ $nota->id }}" :show="$errors->any()" focusable>
+            <form method="post" action="{{ route('notas.destroy', $nota->id) }}" class="p-6">
+                @csrf
+                @method('delete')
+
+                <h2 class="text-lg font-medium text-gray-900">
+                    {{ __('Tem certeza que deseja excluir esta nota?') }}
+                </h2>
+
+                <p class="mt-1 text-sm text-gray-600">
+                    {{ __('Esta ação não pode ser desfeita. Todos os dados desta nota serão permanentemente removidos.') }}
+                </p>
+
+                <div class="mt-6 flex justify-end">
+                    <x-secondary-button type="button" x-on:click="$dispatch('close')">
+                        {{ __('Cancelar') }}
+                    </x-secondary-button>
+
+                    <x-danger-button class="ms-3">
+                        {{ __('Excluir Nota') }}
+                    </x-danger-button>
+                </div>
+            </form>
+        </x-modal>
+    @endforeach
 </x-app-layout>

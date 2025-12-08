@@ -20,6 +20,6 @@ class Turma extends Model
 
     public function notas()
     {
-        return $this->belongsToMany(Notas::class, 'nota_turma', 'turma_id', 'nota_id');
+        return $this->hasMany(Notas::class);
     }
 }

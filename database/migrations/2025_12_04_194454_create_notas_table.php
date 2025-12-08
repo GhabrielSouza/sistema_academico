@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->id();
             $table->double('valor');
             $table->foreignId('turma_id')->constrained('turmas');
-            $table->foreignId('aluno_id')->constrained('alunos');
+            $table->foreignId('aluno_id')->constrained('users');
             $table->timestamps();
             $table->softDeletes();
         });

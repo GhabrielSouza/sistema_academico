@@ -25,9 +25,15 @@ class DisciplinaController extends Controller
         }
 
         $dados = $request->validate([
-            'nome' => 'required',
-            'codigo' => 'required|unique:disciplinas',
-            'descricao' => 'nullable',
+            'nome' => 'required|string|max:255|unique:disciplinas,nome',
+            'descricao' => 'nullable|string|max:1000',
+        ], [
+            'nome.required' => 'O campo nome é obrigatório.',
+            'nome.string' => 'O campo nome deve ser uma string.',
+            'nome.max' => 'O campo nome deve ter no máximo 255 caracteres.',
+            'nome.unique' => 'Já existe uma disciplina com esse nome.',
+            'descricao.string' => 'O campo descrição deve ser uma string.',
+            'descricao.max' => 'O campo descrição deve ter no máximo 1000 caracteres.',
         ]);
 
         Disciplina::create($dados);
@@ -45,6 +51,8 @@ class DisciplinaController extends Controller
         $request->validate([
             'nome' => 'required',
             'descricao' => 'nullable',
+        ], [
+            'nome.required' => 'O campo nome é obrigatório.',
         ]);
 
         $disciplina = Disciplina::findOrFail($id);
