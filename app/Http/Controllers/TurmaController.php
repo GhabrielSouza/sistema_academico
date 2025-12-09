@@ -32,7 +32,7 @@ class TurmaController extends Controller
             abort(403, 'Acesso não autorizado.');
         }
 
-        $dados = $request->validate([
+        $dados = $request->validateWithBag('criarTurma',[
             'nome' => 'required',
             'descricao' => 'nullable',
             'disciplina_id' => 'required|exists:disciplinas,id',
@@ -57,19 +57,22 @@ class TurmaController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
+        $request->validateWithBag('atualizarTurma',[
             'nome' => 'required',
-            'descricao' => 'nullable',
+            'disciplina_id' => 'required',
+            'professor_id' => 'required'
         ], [
             'nome.required' => 'O campo nome é obrigatório.',
+            'disciplina_id.required' => 'O campo disciplina é obrigatório.',
+            'professor_id.required' => 'O campo professor é obrigatório.',
+
         ]);
 
         $turma = Turma::findOrFail($id);
 
         $turma->nome = $request->input('nome');
-        $turma->descricao = $request->input('descricao');
-        $turma->id_disciplina = $request->input('id_disciplina');
-        $turma->id_professor = $request->input('id_professor');
+        $turma->disciplina_id = $request->input('disciplina_id');
+        $turma->professor_id = $request->input('professor_id');
         $turma->save();
 
         return redirect()->route('turmas.index')->with('success', 'Turma atualizada com sucesso!');

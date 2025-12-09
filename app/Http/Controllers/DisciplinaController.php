@@ -24,7 +24,7 @@ class DisciplinaController extends Controller
             abort(403, 'Acesso não autorizado.');
         }
 
-        $dados = $request->validate([
+        $dados = $request->validateWithBag('criarDisciplina',[
             'nome' => 'required|string|max:255|unique:disciplinas,nome',
             'descricao' => 'nullable|string|max:1000',
         ], [
@@ -48,7 +48,7 @@ class DisciplinaController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
+        $request->validateWithBag('atualizarDisciplina',[
             'nome' => 'required',
             'descricao' => 'nullable',
         ], [

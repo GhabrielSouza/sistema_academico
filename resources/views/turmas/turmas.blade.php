@@ -1,4 +1,8 @@
+@php
+    $turmaWithError = old('turma_id_error');
+@endphp
 <x-app-layout>
+    
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Turmas') }}
@@ -194,7 +198,7 @@
     <!-- MODAIS (FORA DA TABELA) -->
 
     <!-- Modal de criação -->
-    <x-modal name="create-turma" :show="$errors->any()" focusable>
+    <x-modal name="create-turma" :show="$errors->criarTurma->any()" focusable>
         <form method="post" action="{{ route('turmas.store') }}" class="p-6">
             @csrf
 
@@ -208,7 +212,7 @@
                 <x-text-input id="nome" name="nome" type="text" class="mt-1 block w-3/4"
                     placeholder="{{ __('Digite o nome da turma') }}" value="{{ old('nome') }}" />
 
-                <x-input-error :messages="$errors->get('nome')" class="mt-2" />
+                <x-input-error :messages="$errors->criarTurma->get('nome')" class="mt-2" />
             </div>
 
             <div class="mt-6">
@@ -224,7 +228,7 @@
                     @endforeach
                 </select>
 
-                <x-input-error :messages="$errors->get('professor_id')" class="mt-2" />
+                <x-input-error :messages="$errors->criarTurma->get('professor_id')" class="mt-2" />
             </div>
 
             <div class="mt-6">
@@ -240,11 +244,11 @@
                     @endforeach
                 </select>
 
-                <x-input-error :messages="$errors->get('disciplina_id')" class="mt-2" />
+                <x-input-error :messages="$errors->criarTurma->get('disciplina_id')" class="mt-2" />
             </div>
 
             <div class="mt-6 flex justify-end">
-                <x-secondary-button type="button" x-on:click="$dispatch('close')">
+                <x-secondary-button type="button" x-on:click="window.location.href = '{{ route('clear.session') }}';$dispatch('close');">
                     {{ __('Cancelar') }}
                 </x-secondary-button>
 
@@ -258,14 +262,18 @@
     <!-- Modais dinâmicos para cada turma -->
     @foreach ($turmas as $turma)
         <!-- Modal de atualizar turma -->
-        <x-modal name="edit-turma-{{ $turma->id }}" :show="$errors->any()" focusable>
+        <x-modal name="edit-turma-{{ $turma->id }}" :show="$turmaWithError == $turma->id&& $errors->atualizarTurma->any()" focusable>
             <form method="post" action="{{ route('turmas.update', $turma->id) }}" class="p-6">
                 @csrf
                 @method('put')
 
+
                 <h2 class="text-lg font-medium text-gray-900">
                     {{ __('Editar Turma') }}
                 </h2>
+
+                <input type="hidden" name="turma_id_error" value="{{ $turma->id }}">
+
 
                 <div class="mt-6">
                     <x-input-label for="nome" value="{{ __('Nome') }}" />
@@ -273,7 +281,7 @@
                     <x-text-input id="nome" name="nome" type="text" class="mt-1 block w-3/4"
                         placeholder="{{ __('Digite o nome da turma') }}" value="{{ old('nome', $turma->nome) }}" />
 
-                    <x-input-error :messages="$errors->get('nome')" class="mt-2" />
+                    <x-input-error :messages="$errors->atualizarTurma->get('nome')" class="mt-2" />
                 </div>
 
                 <div class="mt-6">
@@ -289,7 +297,7 @@
                         @endforeach
                     </select>
 
-                    <x-input-error :messages="$errors->get('professor_id')" class="mt-2" />
+                    <x-input-error :messages="$errors->atualizarTurma->get('professor_id')" class="mt-2" />
                 </div>
 
                 <div class="mt-6">
@@ -305,11 +313,11 @@
                         @endforeach
                     </select>
 
-                    <x-input-error :messages="$errors->get('disciplina_id')" class="mt-2" />
+                    <x-input-error :messages="$errors->atualizarTurma->get('disciplina_id')" class="mt-2" />
                 </div>
 
                 <div class="mt-6 flex justify-end">
-                    <x-secondary-button type="button" x-on:click="$dispatch('close')">
+                    <x-secondary-button type="button" x-on:click="window.location.href = '{{ route('clear.session') }}'; $dispatch('close');">
                         {{ __('Cancelar') }}
                     </x-secondary-button>
 

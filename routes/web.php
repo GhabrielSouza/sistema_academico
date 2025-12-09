@@ -5,6 +5,8 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TurmaController;
 use App\Http\Controllers\DisciplinaController;
+use Illuminate\Support\Facades\Session;
+
 
 Route::get('/', function () {
     return redirect('/login');
@@ -18,6 +20,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/clear-session', function () {
+    Session::forget('_old_input'); 
+    Session::forget('errors');    
+    return redirect()->back();  
+})->name('clear.session');
+
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -26,6 +34,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::resource('turmas', TurmaController::class);
             Route::resource('disciplinas', DisciplinaController::class);
             Route::resource('notas', NotasController::class);
+          
             Route::get('/dashboard', function () {
                 return view('dashboard');
             })->name('dashboard');
@@ -41,5 +50,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/aluno/notas', [NotasController::class, 'index'])->name('aluno.notas');
     });
 });
+
 
 require __DIR__ . '/auth.php';

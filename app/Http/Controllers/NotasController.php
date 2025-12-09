@@ -45,7 +45,7 @@ class NotasController extends Controller
             abort(403, 'Acesso não autorizado.');
         }
 
-        $request->validate([
+        $request->validateWithBag('criarNota',[
             'valor' => 'required|numeric|min:0|max:100',
             'turma_id' => 'required|exists:turmas,id',
             'aluno_id' => 'required|exists:users,id',
@@ -79,8 +79,8 @@ class NotasController extends Controller
         if ($request->user()->role !== 'professor' && $request->user()->role !== 'admin') {
             abort(403, 'Acesso não autorizado.');
         }
-
-        $request->validate([
+ 
+        $request->validateWithBag('atualizarNota',[
             'valor' => 'required|numeric',
             'turma_id' => 'required|exists:turmas,id',
             'aluno_id' => 'required|exists:users,id',

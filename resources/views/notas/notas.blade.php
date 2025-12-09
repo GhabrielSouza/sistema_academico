@@ -1,3 +1,7 @@
+@php
+    $notasWithErrors = old('nota_id_error');
+    $hasUpdateErrors = $errors->hasBag('atualizarNota');
+@endphp
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -249,7 +253,7 @@
     <!-- MODAIS (DEVEM ESTAR FORA DA TABELA) -->
 
     <!-- Modal de criação -->
-    <x-modal name="confirm-user-create" :show="$errors->any()" focusable>
+    <x-modal name="confirm-user-create" :show="$errors->criarNota->any()" focusable>
         <form method="post" action="{{ route('notas.store') }}" class="p-6">
             @csrf
 
@@ -263,7 +267,7 @@
                 <x-text-input id="valor" name="valor" type="number" min="0" max="100" step="0.01"
                     class="mt-1 block w-3/4" placeholder="{{ __('Valor') }}" value="{{ old('valor') }}" />
 
-                <x-input-error :messages="$errors->get('valor')" class="mt-2" />
+                <x-input-error :messages="$errors->criarNota->get('valor')" class="mt-2" />
             </div>
 
             <div class="mt-6">
@@ -279,7 +283,7 @@
                     @endforeach
                 </select>
 
-                <x-input-error :messages="$errors->get('aluno_id')" class="mt-2" />
+                <x-input-error :messages="$errors->criarNota->get('aluno_id')" class="mt-2" />
             </div>
 
             <div class="mt-6">
@@ -295,7 +299,7 @@
                     @endforeach
                 </select>
 
-                <x-input-error :messages="$errors->get('turma_id')" class="mt-2" />
+                <x-input-error :messages="$errors->criarNota->get('turma_id')" class="mt-2" />
             </div>
 
             <div class="mt-6 flex justify-end">
@@ -313,24 +317,25 @@
     <!-- Modais dinâmicos para cada nota (fora da tabela) -->
     @foreach ($notas as $nota)
         <!-- Modal de atualizar nota -->
-        <x-modal name="confirm-user-update-{{ $nota->id }}" :show="$errors->any()" focusable>
+        <x-modal name="confirm-user-update-{{ $nota->id }}" :show="$notasWithErrors == $nota->id && $errors->atualizarNota->any()" focusable>
             <form method="post" action="{{ route('notas.update', $nota->id) }}" class="p-6">
                 @csrf
                 @method('put')
                 <h2 class="text-lg font-medium text-gray-900">
                     {{ __('Atualizar Nota') }}
                 </h2>
+                <input type="hidden" name="nota_id_error" value="{{ $nota->id }}">
 
                 <div class="mt-6">
                     <x-input-label for="valor" value="{{ __('Nota') }}" />
 
                     <x-text-input id="valor" name="valor" type="number" min="0" max="100"
                         step="0.01" class="mt-1 block w-3/4" placeholder="{{ __('Valor') }}"
-                        value="{{ old('valor', $nota->valor) }}" />
+                        value="{{ $hasUpdateErrors ? old('valor', $nota->valor) : $nota->valor }}"/>
 
-                    <x-input-error :messages="$errors->get('valor')" class="mt-2" />
+                    <x-input-error :messages="$errors->atualizarNota->get('valor')" class="mt-2" />
                 </div>
-
+                <input type="hidden">
                 <div class="mt-6">
                     <x-input-label for="aluno_id" value="{{ __('Aluno') }}" />
 
@@ -344,7 +349,7 @@
                         @endforeach
                     </select>
 
-                    <x-input-error :messages="$errors->get('aluno_id')" class="mt-2" />
+                    <x-input-error :messages="$errors->atualizarNota->get('aluno_id')" class="mt-2" />
                 </div>
 
                 <div class="mt-6">
@@ -360,11 +365,11 @@
                         @endforeach
                     </select>
 
-                    <x-input-error :messages="$errors->get('turma_id')" class="mt-2" />
+                    <x-input-error :messages="$errors->atualizarNota->get('turma_id')" class="mt-2" />
                 </div>
 
                 <div class="mt-6 flex justify-end">
-                    <x-secondary-button type="button" x-on:click="$dispatch('close')">
+                    <x-secondary-button type="button" x-on:click="window.location.href = '{{ route('clear.session') }}';$dispatch('close');">
                         {{ __('Cancelar') }}
                     </x-secondary-button>
 
@@ -376,7 +381,7 @@
         </x-modal>
 
         <!-- Modal de excluir -->
-        <x-modal name="delete-modal-{{ $nota->id }}" :show="$errors->any()" focusable>
+        <x-modal name="delete-modal-{{ $nota->id }}" focusable>
             <form method="post" action="{{ route('notas.destroy', $nota->id) }}" class="p-6">
                 @csrf
                 @method('delete')

@@ -1,3 +1,7 @@
+@php
+    $disciplinaWithError = old('disciplina_id_error');
+@endphp
+
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -186,7 +190,7 @@
     <!-- MODAIS (FORA DA TABELA) -->
 
     <!-- Modal de criação -->
-    <x-modal name="create-disciplina" :show="$errors->any()" focusable>
+    <x-modal name="create-disciplina" :show="$disciplinaWithError == $disciplina->id && $errors->criarDisciplina->any()" focusable>
         <form method="post" action="{{ route('disciplinas.store') }}" class="p-6">
             @csrf
 
@@ -200,7 +204,7 @@
                 <x-text-input id="nome" name="nome" type="text" class="mt-1 block w-3/4"
                     placeholder="{{ __('Digite o nome da disciplina') }}" value="{{ old('nome') }}" />
 
-                <x-input-error :messages="$errors->get('nome')" class="mt-2" />
+                <x-input-error :messages="$errors->criarDisciplina->get('nome')" class="mt-2" />
             </div>
 
             <div class="mt-6">
@@ -210,11 +214,11 @@
                     class="mt-1 block w-3/4 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     placeholder="{{ __('Digite a descrição da disciplina') }}">{{ old('descricao') }}</textarea>
 
-                <x-input-error :messages="$errors->get('descricao')" class="mt-2" />
+                <x-input-error :messages="$errors->criarDisciplina->get('descricao')" class="mt-2" />
             </div>
 
             <div class="mt-6 flex justify-end">
-                <x-secondary-button type="button" x-on:click="$dispatch('close')">
+                <x-secondary-button type="button" x-on:click="$dispatch('close');">
                     {{ __('Cancelar') }}
                 </x-secondary-button>
 
@@ -228,10 +232,13 @@
     <!-- Modais dinâmicos para cada disciplina -->
     @foreach ($disciplinas as $disciplina)
         <!-- Modal de atualizar disciplina -->
-        <x-modal name="edit-disciplina-{{ $disciplina->id }}" :show="$errors->any()" focusable>
+        <x-modal name="edit-disciplina-{{ $disciplina->id }}" :show="$disciplinaWithError == $disciplina->id && $errors->atualizarDisciplina->any()" focusable>
             <form method="post" action="{{ route('disciplinas.update', $disciplina->id) }}" class="p-6">
                 @csrf
                 @method('put')
+
+                <input type="hidden" name="disciplina_id_error" value="{{ $disciplina->id }}">
+
 
                 <h2 class="text-lg font-medium text-gray-900">
                     {{ __('Editar Disciplina') }}
@@ -244,7 +251,7 @@
                         placeholder="{{ __('Digite o nome da disciplina') }}"
                         value="{{ old('nome', $disciplina->nome) }}" />
 
-                    <x-input-error :messages="$errors->get('nome')" class="mt-2" />
+                    <x-input-error :messages="$errors->atualizarDisciplina->get('nome')" class="mt-2" />
                 </div>
 
                 <div class="mt-6">
@@ -254,11 +261,11 @@
                         class="mt-1 block w-3/4 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         placeholder="{{ __('Digite a descrição da disciplina') }}">{{ old('descricao', $disciplina->descricao) }}</textarea>
 
-                    <x-input-error :messages="$errors->get('descricao')" class="mt-2" />
+                    <x-input-error :messages="$errors->atualizarDisciplina->get('descricao')" class="mt-2" />
                 </div>
 
                 <div class="mt-6 flex justify-end">
-                    <x-secondary-button type="button" x-on:click="$dispatch('close')">
+                    <x-secondary-button type="button" x-on:click="window.location.href = '{{ route('clear.session') }}';$dispatch('close');">
                         {{ __('Cancelar') }}
                     </x-secondary-button>
 
